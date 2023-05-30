@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'username' => 'agend',
+            'username' => 'tester1',
             'password' => bcrypt('PASSWORD'),
             'last_login' => Carbon::now(),
             'is_active' => 1,

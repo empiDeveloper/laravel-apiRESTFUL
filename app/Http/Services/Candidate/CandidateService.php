@@ -4,6 +4,7 @@ namespace App\Http\Services\Candidate;
 use App\Models\Candidate;
 use App\Http\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
+use App\Http\Traits\CandidateTrait;
 
 class CandidateService {
 
@@ -47,7 +48,9 @@ class CandidateService {
     public static function getCandidate($id)
     {
         try {
-            $response = Candidate::find($id);
+            $data = CandidateTrait::getCandidatesCache();
+            $response = $data->where('id', $id)->first();
+
             return ResponseTrait::responseSuccess($response, 200);
         } catch(\Exception $e) {
             throw $e;
@@ -58,6 +61,8 @@ class CandidateService {
     {
         try {
             $user = auth()->user();
+            CandidateTrait::putCandidatesCache();
+
             if ($user->role === 'manager') {
                 $response = self::allCandidates();
             } else {
@@ -73,7 +78,7 @@ class CandidateService {
     public static function allCandidates()
     {
         try {
-            $response = Candidate::all();
+            $response = CandidateTrait::getCandidatesCache();
             return (object)[
                 'success' => true,
                 'data' => $response,
@@ -86,7 +91,9 @@ class CandidateService {
     public static function candidatesOwner($idOwner)
     {
         try {
-            $response = Candidate::whereOwner($idOwner)->get();
+            $data = CandidateTrait::getCandidatesCache();
+            $response = $data->where('owner', $idOwner)->values();
+
             return (object)[
                 'success' => true,
                 'data' => $response,
